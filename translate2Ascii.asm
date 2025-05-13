@@ -3,8 +3,6 @@
 section .data
 inputbuf:
     db 0x83,0x6A,0x88,0xDE,0x9A,0xC3,0x54,0x9A ;data to be output in ASCII format
-asciistuff:
-    db '0123456789ABCDEF'
 
 section .bss
 outputbuf:
@@ -18,41 +16,41 @@ _start:
     mov esi, inputbuf
     mov ecx, 8
 
-convert_bytes:
-
+convert_high:
     ;converting first half, ex 0x83 -> 0x8
     ;use al so we only use 8 bits
-    mov eax, 0
-    mov al, byte [esi]
-    AND al, 0xF0
-    shr al, 4
-    mov ah, [asciistuff+eax]
-    mov [edi], ah
-    inc edi
-
+    mov eax, 0 ; initialize eax to 0
+    mov al, byte [esi] ; move the next byte into the 8 bit al register
+    AND al, 0xF0 ; mask al to get only the high part/nibble
+    shr al, 4 ; shift it to the end
+    
+    cmp al, 10
+    jge ascii_high
+    jmp digit_high
+    
+convert_low:
     ;converting second half ex 0x83 ->0x3
+    ; same thing as upper bit, just different masking and no need to shr
 
     mov eax, 0
     mov al, byte [esi]
     AND al, 0x0F
-    mov ah, [asciistuff+eax]
-    mov [edi], ah
-    inc edi
-    
-    ; add a space and continue
-    mov byte [edi], ' '
-    inc edi
 
+    cmp al, 10
+    jge ascii_low
+    jmp digit_low
+    
+isdone:
     ;if still more bytes, esi != 0 so keep looping
     inc esi 
     dec ecx
-    jnz convert_bytes
+    jnz convert_high
 
+    ;add a newline
     mov byte [edi], 0X0A
     inc edi
-    
 
-    ;print and exit
+    ;print the ascii
     sub edi, outputbuf
     mov eax, 4
     mov ebx, 1
@@ -60,7 +58,35 @@ convert_bytes:
     mov ecx, outputbuf
     int 80h
 
+    ; exit 0
     mov eax, 1
     mov ebx, 0
     int 80h
 
+digit_high:
+    add al, 0x30
+    mov [edi], al ; move the value into edi
+    inc edi ;move to the next part of edi
+    jmp convert_low
+
+ascii_high:
+    add al, 0x37
+    mov [edi], al ; move the value into edi
+    inc edi ;move to the next part of edi
+    jmp convert_low
+
+digit_low:
+    add al, 0x30
+    mov [edi], al ; move the value into edi
+    inc edi ;move to the next part of edi
+    mov byte [edi], ' '
+    inc edi
+    jmp isdone
+
+ascii_low:
+    add al, 0x37
+    mov [edi], al ; move the value into edi
+    inc edi ;move to the next part of edi
+    mov byte [edi], ' '
+    inc edi
+    jmp isdone
