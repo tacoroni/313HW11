@@ -23,6 +23,8 @@ convert_high:
     mov al, byte [esi] ; move the next byte into the 8 bit al register
     AND al, 0xF0 ; mask al to get only the high part/nibble
     shr al, 4 ; shift it to the end
+
+    ; process accordingly, whether it is a letter or a digit
     cmp al, 10
     jge ascii_high
     jmp digit_high
@@ -34,12 +36,14 @@ convert_low:
     mov eax, 0
     mov al, byte [esi]
     AND al, 0x0F
+
+    ; process accordingly, whether it is a letter or a digit
     cmp al, 10
     jge ascii_low
     jmp digit_low
     
 isdone:
-    ;if still more bytes, esi != 0 so keep looping
+    ; if not done it will go back to convert_high and keep looping
     inc esi 
     dec ecx
     jnz convert_high
@@ -65,12 +69,14 @@ digit_high:
     add al, 0x30
     mov [edi], al ; move the value into edi
     inc edi ;move to the next part of edi
+    ; jmp to the function that converts the low part
     jmp convert_low
 
 ascii_high:
     add al, 0x37
     mov [edi], al ; move the value into edi
     inc edi ;move to the next part of edi
+    ; jmp to the function that converts the low part
     jmp convert_low
 
 digit_low:
@@ -79,6 +85,7 @@ digit_low:
     inc edi ;move to the next part of edi
     mov byte [edi], ' '
     inc edi
+    ;check if done
     jmp isdone
 
 ascii_low:
@@ -87,4 +94,5 @@ ascii_low:
     inc edi ;move to the next part of edi
     mov byte [edi], ' '
     inc edi
+    ; check if done
     jmp isdone
