@@ -22,19 +22,19 @@ convert_bytes:
 
     ;converting first half, ex 0x83 -> 0x8
     ;use al so we only use 8 bits
+    mov eax, 0
     mov al, byte [esi]
     AND al, 0xF0
     shr al, 4
-    movzx eax, al
     mov ah, [asciistuff+eax]
     mov [edi], ah
     inc edi
 
     ;converting second half ex 0x83 ->0x3
 
+    mov eax, 0
     mov al, byte [esi]
     AND al, 0x0F
-    movzx eax, al
     mov ah, [asciistuff+eax]
     mov [edi], ah
     inc edi
