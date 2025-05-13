@@ -23,7 +23,6 @@ convert_high:
     mov al, byte [esi] ; move the next byte into the 8 bit al register
     AND al, 0xF0 ; mask al to get only the high part/nibble
     shr al, 4 ; shift it to the end
-    
     cmp al, 10
     jge ascii_high
     jmp digit_high
@@ -35,7 +34,6 @@ convert_low:
     mov eax, 0
     mov al, byte [esi]
     AND al, 0x0F
-
     cmp al, 10
     jge ascii_low
     jmp digit_low
