@@ -1,4 +1,5 @@
 ;Christian Ayala, CMSC313 HW11, Class Time M/W 1000am
+;File name: translate2Ascii.asm
 
 section .data
 inputbuf:
@@ -18,32 +19,31 @@ _start:
 
 convert_high:
     ;converting first half, ex 0x83 -> 0x8
-    ;use al so we only use 8 bits
-    mov eax, 0 ; initialize eax to 0
+   
     mov al, byte [esi] ; move the next byte into the 8 bit al register
     AND al, 0xF0 ; mask al to get only the high part/nibble
     shr al, 4 ; shift it to the end
 
-    ; process accordingly, whether it is a letter or a digit
+    ; translate accordingly, depending whether it is a letter or a digit
     cmp al, 10
     jge ascii_high
     jmp digit_high
     
 convert_low:
     ;converting second half ex 0x83 ->0x3
-    ; same thing as upper bit, just different masking and no need to shr
+    ; same thing as upper bit, just different masking to get the low end of the byte and no need to shr
 
-    mov eax, 0
     mov al, byte [esi]
     AND al, 0x0F
 
-    ; process accordingly, whether it is a letter or a digit
+    ; process accordingly, depending it is a letter or a digit
     cmp al, 10
     jge ascii_low
     jmp digit_low
     
 isdone:
     ; if not done it will go back to convert_high and keep looping
+    ; will continue pass this block if it is done
     inc esi 
     dec ecx
     jnz convert_high
@@ -66,23 +66,27 @@ isdone:
     int 80h
 
 digit_high:
+    ;add 0x30 to get the ASCII value of a number
     add al, 0x30
     mov [edi], al ; move the value into edi
-    inc edi ;move to the next part of edi
+    inc edi 
     ; jmp to the function that converts the low part
     jmp convert_low
 
 ascii_high:
+    ;add 0x37 to get the ASCII value of a letter
     add al, 0x37
     mov [edi], al ; move the value into edi
-    inc edi ;move to the next part of edi
+    inc edi 
     ; jmp to the function that converts the low part
     jmp convert_low
 
+
+;digit_low and ascii_low is the same as the high, only difference is it jumps to isDone
 digit_low:
     add al, 0x30
-    mov [edi], al ; move the value into edi
-    inc edi ;move to the next part of edi
+    mov [edi], al
+    inc edi
     mov byte [edi], ' '
     inc edi
     ;check if done
@@ -90,8 +94,8 @@ digit_low:
 
 ascii_low:
     add al, 0x37
-    mov [edi], al ; move the value into edi
-    inc edi ;move to the next part of edi
+    mov [edi], al
+    inc edi
     mov byte [edi], ' '
     inc edi
     ; check if done
