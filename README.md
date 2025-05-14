@@ -5,9 +5,17 @@ Email: cayala2@umbc.edu
 Class Time: 1000am M/W
 
 
-TO COMPILE: Donwload translate2Ascii.asm
+TO COMPILE: 
+
+Download translate2Ascii.asm
+
+
 do the following commands on either GL or anywhere that uses a x86 intel processor: 
+
+
 nasm -f elf32 -g -F dwarf -o translate2Ascii.o translate2Ascii.asm
+
+
 ld -m elf_i386 -o translate2Ascii translate2Ascii.o
 
 To RUN: ./translate2Ascii
