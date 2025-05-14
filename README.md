@@ -4,6 +4,10 @@ Author: Christian Ayala, CS46491.
 Email: cayala2@umbc.edu
 Class Time: 1000am M/W
 
+Program Description: 
+
+This program takes bytes, in this case 0x83,0x6A,0x88,0xDE,0x9A,0xC3,0x54,0x9A and translates them to ASCII. The expected output is 83 6A 88 DE 9A C3 54 9A
+
 
 TO COMPILE: 
 
